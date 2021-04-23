@@ -5,6 +5,7 @@ const useField = (type) => {
   const [value, setValue] = useState('')
 
   const onChange = (event) => {
+    console.log('Value:', event.target.value)
     setValue(event.target.value)
   }
 
@@ -18,7 +19,32 @@ const useField = (type) => {
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  useEffect(() => {
+    console.log('Name:', name)
+    async function fetchData(name) {
+      try {
+        const result = await axios.get(`https://restcountries.eu/rest/v2/name/${name}?fullText=true`)
+        console.log('Result:', result.status, result.data)
+        setCountry({
+          found: true,
+          data: result.data[0]
+        })
+      } catch (error) {
+        if (error.response.status === 404) {
+          setCountry({
+            found: false
+          })
+        } else {
+          setCountry(null)
+        }
+      }
+    }
+    if (name) {
+      fetchData(name)
+    } else {
+      setCountry(null)
+    }
+  }, [name])
 
   return country
 }
